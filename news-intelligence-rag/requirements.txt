@@ -1,0 +1,60 @@
+# =============================================================================
+# News Intelligence RAG — Hybrid Temporal Retrieval with Contradiction Detection
+# Runtime dependencies (pinned for reproducible builds).
+#
+# Python: 3.10 – 3.12 supported (3.11 recommended).
+# Install:  pip install -r requirements.txt
+#
+# NOTE ON NUMPY: pinned to <2.0 for maximum compatibility with the pinned
+# faiss-cpu wheel. If you bump faiss-cpu to a numpy-2-aware build you may
+# relax this constraint.
+# =============================================================================
+
+# ----------------------------------------------------------------------------
+# Phase 1 — Async ETL & Deduplication
+# ----------------------------------------------------------------------------
+aiohttp==3.11.10            # concurrent async RSS fetching
+feedparser==6.0.11          # robust RSS/Atom parsing
+datasketch==1.6.5           # MinHash + LSH for near-duplicate wire-story removal
+python-dateutil==2.9.0.post0  # tolerant timestamp parsing across feed formats
+tenacity==9.0.0             # exponential-backoff retries on flaky endpoints
+
+# ----------------------------------------------------------------------------
+# Phase 2 — Hybrid Indexing (sparse + dense)
+# ----------------------------------------------------------------------------
+langchain-text-splitters==0.3.4   # recursive, token-aware chunking
+rank-bm25==0.2.2                  # Okapi BM25 sparse index
+faiss-cpu==1.9.0                  # HNSW approximate nearest-neighbour graph
+sentence-transformers==3.3.1      # all-MiniLM-L6-v2 dense encoder
+numpy==1.26.4                     # see NOTE ON NUMPY above
+
+# ----------------------------------------------------------------------------
+# Phase 4 — Validation, Reranking & NLI
+# ----------------------------------------------------------------------------
+transformers==4.47.1        # cross-encoder reranker + DeBERTa-v3 NLI head
+torch==2.5.1                # backend for transformers / sentence-transformers
+sentencepiece==0.2.0        # REQUIRED tokenizer backend for deberta-v3-*
+protobuf==5.29.1            # required by the SentencePiece tokenizer loader
+scikit-learn==1.6.0         # NDCG / ranking-metric utilities for the eval harness
+
+# ----------------------------------------------------------------------------
+# Phase 5 — Serving
+# ----------------------------------------------------------------------------
+fastapi==0.115.6
+uvicorn[standard]==0.32.1
+pydantic==2.10.4
+pydantic-settings==2.7.0    # 12-factor config from env vars / .env
+
+# ----------------------------------------------------------------------------
+# Observability
+# ----------------------------------------------------------------------------
+loguru==0.7.3               # structured, drop-in logging
+
+# =============================================================================
+# Development / test extras live in requirements-dev.txt (not installed in prod):
+#   pytest==8.3.4
+#   pytest-asyncio==0.25.0
+#   httpx==0.28.1            # FastAPI TestClient transport
+#   ruff==0.8.4
+#   mypy==1.14.0
+# =============================================================================
